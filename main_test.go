@@ -140,7 +140,7 @@ func TestRunSelectsFiles(t *testing.T) {
 			},
 		},
 		{
-			name: "Markdown, go.mod, YAML and files without extension are not code",
+			name: "Markdown, go.mod, YAML, JSON and files without extension are not code",
 			files: fstest.MapFS{
 				"README.md":        file("# Title\n"),
 				"go.mod":           file("// note\nmodule a\n"),
@@ -189,7 +189,7 @@ func TestRunReportsUnreadableFile(t *testing.T) {
 	assertChecks(t, []checkCase{
 		{
 			name: "error without findings is printed without the hint",
-			files: unreadable{
+			files: unreadableFS{
 				files: fstest.MapFS{
 					"scripts/a.sh":      file("#!/bin/sh\n"),
 					"scripts/broken.sh": file("#!/bin/sh\n"),
@@ -201,7 +201,7 @@ func TestRunReportsUnreadableFile(t *testing.T) {
 		},
 		{
 			name: "files after the error are still checked",
-			files: unreadable{
+			files: unreadableFS{
 				files: fstest.MapFS{
 					"scripts/broken.sh": file("#!/bin/sh\n"),
 					"scripts/c.sh":      file("# note\n"),
@@ -214,12 +214,12 @@ func TestRunReportsUnreadableFile(t *testing.T) {
 	})
 }
 
-type unreadable struct {
+type unreadableFS struct {
 	files fstest.MapFS
 	name  string
 }
 
-func (u unreadable) Open(name string) (fs.File, error) {
+func (u unreadableFS) Open(name string) (fs.File, error) {
 	if name == u.name {
 		return nil, &fs.PathError{Op: "open", Path: name, Err: fs.ErrPermission}
 	}

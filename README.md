@@ -46,23 +46,24 @@ comments found: move the knowledge into a name, a test or the docs, then delete 
 | Files | A comment is |
 | --- | --- |
 | `*.go`, tests included | any `//` or `/* */` outside string literals, found with `go/scanner` |
-| `*.sh` and every file directly in `.githooks/` | a line whose first non-blank character is `#` |
+| `*.sh` and every file directly in the top-level `.githooks/` | a line whose first non-blank character is `#` |
 | `*.toml` | a line whose first non-blank character is `#` |
 
-The `.git` and `.claude` directories are skipped. Other files (Markdown, YAML, `go.mod`, test fixtures) are not code and are not read.
+Only the `.git` and `.claude` directories are skipped, so `testdata/` and `vendor/` are checked like any other directory. Files of other kinds (Markdown, YAML, JSON, `go.mod`, files without an extension outside `.githooks/`) are not code and are not read.
 
 ## Allowed directives
 
 Tool directives are not comments, as long as they carry no explanation:
 
 - `//go:…` and `//nolint…` with no ` //` after them: `//go:build linux` passes, `//nolint:errcheck // reason` is a finding;
-- `// gitleaks:allow` exactly: `// gitleaks:allow, it is an example` is a finding;
+- `// gitleaks:allow` with nothing else in the comment (spacing does not matter): `// gitleaks:allow, it is an example` is a finding;
 - a shebang on the first line of a shell script: `#!` on any other line is a finding.
 
 ## Limitations
 
 - A trailing shell comment (`cmd # text`) is not detected: without a shell parser it cannot be told apart from `$#` or `${#x}`. Catch it in review.
 - Any text right after `//go:` (`//go:this is a comment`) is taken for a directive.
+- There is no way to exclude a directory: vendored Go code in `vendor/` is reported like your own.
 - Heredocs and multi-line TOML strings are not parsed, so a data line in them that starts with `#` is a finding. Print a shebang for a generated script with a separate command: `{ echo '#!/bin/sh'; cat <<'EOF'; } >file`.
 
 ## Development
