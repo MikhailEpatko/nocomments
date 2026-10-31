@@ -4,6 +4,18 @@
 
 A comment goes stale silently: neither the compiler nor the tests check it, and it drifts away from the code and from the docs that say the same thing. Knowledge that should live belongs where it is checked (a name, a test) or where people look for it (an ADR, a README). `nocomments` keeps comments from creeping back, so you learn about one from your check script or pre-commit hook, not in review.
 
+## Why
+
+In a small Go app of mine there were about 150 lines of comments from the start, about 40 more in the scripts and the pre-commit hook, and a comment header in the config of one of the linters. Most of the comments restated function signatures, and the non-obvious "why"s were already written down in ADRs and the README.
+
+The comments went stale with every change to the code. Neither the compiler nor the tests check them, so they drift away from the code and from the docs that say the same thing.
+
+When an agent writes the code, it imitates the comment density of the code that is already there. The more comments the code has, the more the agent adds with every diff. No rule stops this. My instruction to talk to me in plain language the agent reads as "comments must be in plain language too" and takes it as permission to write them anywhere.
+
+I am not the only one who has questioned the value of comments in code, and developers did not start thinking about it today. Before LLMs, developers split into two camps: some needed comments to understand the code, others found them in the way.
+
+Now there is a way to learn anything up to date about the code without comments: ask an agent. To keep the project free of pointless text and not spend tokens on it, I decided to ban comments in code.
+
 ## Install
 
 ```bash
